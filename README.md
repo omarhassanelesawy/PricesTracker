@@ -2,6 +2,14 @@
 
 A web application that helps you track grocery prices across different supermarkets by uploading receipts (manually or via OCR) and provides powerful search and price comparison features.
 
+## 🔗 Live Demo
+
+**Frontend:** [https://prices-tracker-eta.vercel.app](https://prices-tracker-eta.vercel.app)
+
+**Backend API:** [https://omarhassanelesawy-grocery-tracker-api.hf.space](https://omarhassanelesawy-grocery-tracker-api.hf.space)
+
+**API Docs:** [https://omarhassanelesawy-grocery-tracker-api.hf.space/docs](https://omarhassanelesawy-grocery-tracker-api.hf.space/docs)
+
 ## Features
 
 - **Receipt Management**: Add receipts manually or upload images for OCR extraction
