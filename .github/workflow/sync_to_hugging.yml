@@ -1,0 +1,27 @@
+name: Sync Backend to Hugging Face Hub
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**' # Only trigger if backend changes
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # IMPORTANT: We need the full history to split the subtree
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push Backend to Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        # 1. We define the remote repo
+        # 2. We split the 'backend' folder into a temporary branch
+        # 3. We force push that temporary branch to 'main' on Hugging Face
+        run: |
+          git push https://omarhassanelesawy:$HF_TOKEN@huggingface.co/spaces/omarhassanelesawy/grocery-tracker-api \
+          `git subtree split --prefix backend main`:main --force
