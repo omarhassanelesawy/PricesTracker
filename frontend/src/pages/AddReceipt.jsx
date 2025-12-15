@@ -340,16 +340,6 @@ function AddReceipt() {
                                     <input
                                         type="number"
                                         className="input input-xs"
-                                        placeholder="Price/unit"
-                                        title="Price per kg/L/unit (optional)"
-                                        value={item.unit_price}
-                                        onChange={(e) => updateItem(index, 'unit_price', e.target.value)}
-                                        min="0"
-                                        step="0.01"
-                                    />
-                                    <input
-                                        type="number"
-                                        className="input input-xs"
                                         placeholder="Qty"
                                         value={item.quantity}
                                         onChange={(e) => updateItem(index, 'quantity', e.target.value)}
