@@ -13,6 +13,7 @@ class ItemCreate(BaseModel):
     price: Decimal = Field(..., ge=0)
     quantity: Decimal = Field(default=Decimal("1"), ge=0)
     unit: Optional[str] = Field(None, max_length=50)
+    unit_price: Optional[Decimal] = Field(None, ge=0)
 
 
 class ItemUpdate(BaseModel):
@@ -22,6 +23,7 @@ class ItemUpdate(BaseModel):
     price: Optional[Decimal] = Field(None, ge=0)
     quantity: Optional[Decimal] = Field(None, ge=0)
     unit: Optional[str] = Field(None, max_length=50)
+    unit_price: Optional[Decimal] = Field(None, ge=0)
 
 
 class ItemResponse(BaseModel):
@@ -33,6 +35,7 @@ class ItemResponse(BaseModel):
     price: Decimal
     quantity: Decimal
     unit: Optional[str] = None
+    unit_price: Optional[Decimal] = None
     created_at: datetime
     
     class Config:
@@ -47,6 +50,7 @@ class ItemSearchResult(BaseModel):
     price: Decimal
     quantity: Decimal
     unit: Optional[str] = None
+    unit_price: Optional[Decimal] = None
     supermarket_name: str
     purchase_date: date
     currency: str

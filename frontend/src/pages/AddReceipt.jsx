@@ -25,7 +25,7 @@ function AddReceipt() {
     const [supermarket, setSupermarket] = useState('')
     const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0])
     const [currency, setCurrency] = useState(user?.currency || 'EGP')
-    const [items, setItems] = useState([{ name: '', brand: '', price: '', quantity: '1', unit: '' }])
+    const [items, setItems] = useState([{ name: '', brand: '', price: '', quantity: '1', unit: '', unit_price: '' }])
     const [notes, setNotes] = useState('')
 
     // OCR state
@@ -61,6 +61,7 @@ function AddReceipt() {
                     price: item.price?.toString() || '',
                     quantity: item.quantity?.toString() || '1',
                     unit: item.unit || '',
+                    unit_price: item.unit_price?.toString() || '',
                 })))
             }
         } catch (err) {
@@ -89,7 +90,7 @@ function AddReceipt() {
 
     // Item management
     const addItem = () => {
-        setItems([...items, { name: '', brand: '', price: '', quantity: '1', unit: '' }])
+        setItems([...items, { name: '', brand: '', price: '', quantity: '1', unit: '', unit_price: '' }])
     }
 
     const removeItem = (index) => {
@@ -142,6 +143,7 @@ function AddReceipt() {
                     price: parseFloat(item.price),
                     quantity: parseFloat(item.quantity) || 1,
                     unit: item.unit.trim() || null,
+                    unit_price: item.unit_price ? parseFloat(item.unit_price) : null,
                 })),
             }
 
@@ -334,6 +336,16 @@ function AddReceipt() {
                                         min="0"
                                         step="0.01"
                                         required
+                                    />
+                                    <input
+                                        type="number"
+                                        className="input input-xs"
+                                        placeholder="Price/unit"
+                                        title="Price per kg/L/unit (optional)"
+                                        value={item.unit_price}
+                                        onChange={(e) => updateItem(index, 'unit_price', e.target.value)}
+                                        min="0"
+                                        step="0.01"
                                     />
                                     <input
                                         type="number"

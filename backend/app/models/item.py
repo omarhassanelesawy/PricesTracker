@@ -48,6 +48,10 @@ class Item(Base):
         String(50),
         nullable=True,
     )
+    unit_price: Mapped[Decimal | None] = mapped_column(
+        Numeric(10, 2),
+        nullable=True,
+    )
     
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(

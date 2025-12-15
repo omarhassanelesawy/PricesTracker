@@ -161,6 +161,7 @@ Other Important Notes:
                         price=Decimal(str(item.get('price', 0))),
                         quantity=Decimal(str(item.get('quantity', 1))),
                         unit=item.get('unit'),
+                        unit_price=Decimal(str(item.get('unit_price'))) if item.get('unit_price') else None,
                     ))
                 except (InvalidOperation, ValueError):
                     continue
