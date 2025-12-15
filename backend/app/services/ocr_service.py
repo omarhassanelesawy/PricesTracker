@@ -104,6 +104,7 @@ Important:
 - Prices should be numbers without currency symbols
 - If information is not visible or unclear, use null
 - For Arabic text, translate item names to English if possible
+- There is a column that you should consider it if exists, this column is the price of the item per kilo, not the amount the user purchase
 - Return ONLY valid JSON, no other text"""
 
         try:
