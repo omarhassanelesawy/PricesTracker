@@ -105,11 +105,12 @@ function AddReceipt() {
     }
 
     // Calculate total
+    // Note: price field already represents the total paid for each item (unit_price × quantity)
+    // So we just sum the prices directly
     const calculateTotal = () => {
         return items.reduce((sum, item) => {
             const price = parseFloat(item.price) || 0
-            const quantity = parseFloat(item.quantity) || 1
-            return sum + (price * quantity)
+            return sum + price
         }, 0)
     }
 
