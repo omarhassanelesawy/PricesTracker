@@ -91,20 +91,37 @@ class OCRService:
             "name": "Item name",
             "brand": "Brand name if visible, null otherwise",
             "price": 0.00,
-            "quantity": 1,
-            "unit": "kg, L, pcs, etc if visible, null otherwise"
+            "quantity": 1.0,
+            "unit": "kg, L, pcs, etc if visible, null otherwise",
+            "unit_price": 0.00
         }
     ],
     "total_amount": 0.00,
     "raw_text": "Full extracted text from the receipt"
 }
 
-Important:
+CRITICAL - Handling Weighted/Bulk Items:
+Many receipts show items sold by weight (per kg, per lb) or by volume (per L) with THREE pieces of information:
+1. UNIT PRICE - The price per kg/lb/L (e.g., "150.00/kg")
+2. QUANTITY - The amount purchased (e.g., "0.500 kg")  
+3. PAID PRICE - The actual amount paid = unit_price × quantity (e.g., "75.00")
+
+For the "price" field, ALWAYS use the PAID PRICE (the total amount charged for that item), NOT the unit price.
+The "unit_price" field should contain the per-unit price (per kg, per L, etc.) if shown.
+The "quantity" field should reflect the actual amount purchased (e.g., 0.5 for half a kg).
+
+VALIDATION:
+- The sum of all item "price" values should approximately equal the "total_amount" shown at the bottom of the receipt
+- If your calculated sum doesn't match the receipt total, re-check your extraction of the "price" fields
+- Common receipt formats:
+  * "Item Name    150.00/KG    0.500    75.00" → price=75.00, unit_price=150.00, quantity=0.5
+  * "Item Name    2 × 25.00    50.00" → price=50.00, quantity=2, unit_price=25.00
+
+Other Important Notes:
 - Extract ALL items you can see with their prices
 - Prices should be numbers without currency symbols
 - If information is not visible or unclear, use null
 - For Arabic text, translate item names to English if possible
-- There is a column that you should consider it if exists, this column is the price of the item per kilo, not the amount the user purchase
 - Return ONLY valid JSON, no other text"""
 
         try:
