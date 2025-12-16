@@ -14,6 +14,7 @@ function Search() {
     const [dateTo, setDateTo] = useState('')
     const [sortBy, setSortBy] = useState('date')
     const [sortOrder, setSortOrder] = useState('desc')
+    const [useRegex, setUseRegex] = useState(false)
 
     // Results state
     const [results, setResults] = useState([])
@@ -57,6 +58,7 @@ function Search() {
                 sortOrder,
                 page,
                 pageSize: 20,
+                useRegex,
             })
 
             setResults(data.results)
@@ -100,6 +102,7 @@ function Search() {
         setDateTo('')
         setSortBy('date')
         setSortOrder('desc')
+        setUseRegex(false)
         setResults([])
         setSearched(false)
         setPage(1)
@@ -196,6 +199,17 @@ function Search() {
                             <option value="desc">Newest / Highest</option>
                             <option value="asc">Oldest / Lowest</option>
                         </select>
+                    </div>
+
+                    <div className="filter-group filter-checkbox">
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                checked={useRegex}
+                                onChange={(e) => setUseRegex(e.target.checked)}
+                            />
+                            <span>Regex</span>
+                        </label>
                     </div>
 
                     <button type="button" className="btn btn-ghost filter-reset" onClick={handleReset}>

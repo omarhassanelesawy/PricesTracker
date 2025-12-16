@@ -53,7 +53,7 @@ export const receiptService = {
 
 export const searchService = {
     // Search items
-    async search({ keyword, supermarket, dateFrom, dateTo, sortBy, sortOrder, page, pageSize } = {}) {
+    async search({ keyword, supermarket, dateFrom, dateTo, sortBy, sortOrder, page, pageSize, useRegex } = {}) {
         const params = new URLSearchParams()
         params.append('keyword', keyword)
         if (supermarket) params.append('supermarket', supermarket)
@@ -63,6 +63,7 @@ export const searchService = {
         if (sortOrder) params.append('sort_order', sortOrder)
         if (page) params.append('page', page)
         if (pageSize) params.append('page_size', pageSize)
+        if (useRegex) params.append('use_regex', 'true')
 
         const response = await api.get(`/search?${params}`)
         return response.data

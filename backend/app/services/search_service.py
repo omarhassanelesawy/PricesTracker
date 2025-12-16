@@ -3,6 +3,7 @@
 from datetime import date
 from decimal import Decimal
 from typing import Optional, List
+import re
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_, and_, desc, asc
@@ -35,6 +36,7 @@ class SearchService:
         sort_order: str = "desc",
         page: int = 1,
         page_size: int = 20,
+        use_regex: bool = False,
     ) -> SearchResponse:
         """Search items by keyword across user's receipts."""
         # Build base query with joins
@@ -44,12 +46,23 @@ class SearchService:
             .where(Receipt.user_id == user_id)
         )
         
-        # Apply keyword search (case-insensitive, partial match)
-        keyword_filter = or_(
-            func.lower(Item.name).contains(keyword.lower()),
-            func.lower(Item.brand).contains(keyword.lower()),
-        )
-        query = query.where(keyword_filter)
+        # Apply keyword search
+        if use_regex:
+            # For regex, we'll filter in Python after fetching
+            # First validate the regex pattern
+            try:
+                regex_pattern = re.compile(keyword, re.IGNORECASE)
+            except re.error:
+                # Invalid regex, fall back to literal search
+                use_regex = False
+        
+        if not use_regex:
+            # Standard case-insensitive, partial match
+            keyword_filter = or_(
+                func.lower(Item.name).contains(keyword.lower()),
+                func.lower(Item.brand).contains(keyword.lower()),
+            )
+            query = query.where(keyword_filter)
         
         # Apply supermarket filter
         if supermarket:
@@ -63,11 +76,6 @@ class SearchService:
         if date_to:
             query = query.where(Receipt.purchase_date <= date_to)
         
-        # Get total count
-        count_query = select(func.count()).select_from(query.subquery())
-        total_result = await self.db.execute(count_query)
-        total = total_result.scalar()
-        
         # Apply sorting
         if sort_by == "date":
             order_col = Receipt.purchase_date
@@ -79,17 +87,40 @@ class SearchService:
         else:
             query = query.order_by(asc(order_col))
         
-        # Apply pagination
-        offset = (page - 1) * page_size
-        query = query.offset(offset).limit(page_size)
-        
-        # Execute query
-        result = await self.db.execute(query)
-        rows = result.all()
+        if use_regex:
+            # For regex search, we need to fetch all matching items and filter in Python
+            result = await self.db.execute(query)
+            rows = result.all()
+            
+            # Filter by regex pattern
+            filtered_rows = []
+            for item, receipt in rows:
+                name_match = regex_pattern.search(item.name) if item.name else False
+                brand_match = regex_pattern.search(item.brand) if item.brand else False
+                if name_match or brand_match:
+                    filtered_rows.append((item, receipt))
+            
+            total = len(filtered_rows)
+            
+            # Apply pagination to filtered results
+            offset = (page - 1) * page_size
+            paginated_rows = filtered_rows[offset:offset + page_size]
+        else:
+            # Standard search - get count and paginate in SQL
+            count_query = select(func.count()).select_from(query.subquery())
+            total_result = await self.db.execute(count_query)
+            total = total_result.scalar()
+            
+            # Apply pagination
+            offset = (page - 1) * page_size
+            query = query.offset(offset).limit(page_size)
+            
+            result = await self.db.execute(query)
+            paginated_rows = result.all()
         
         # Convert to response objects
         results = []
-        for item, receipt in rows:
+        for item, receipt in paginated_rows:
             results.append(ItemSearchResult(
                 id=item.id,
                 name=item.name,
@@ -102,7 +133,7 @@ class SearchService:
                 currency=receipt.currency,
             ))
         
-        total_pages = (total + page_size - 1) // page_size
+        total_pages = (total + page_size - 1) // page_size if total > 0 else 0
         
         return SearchResponse(
             results=results,

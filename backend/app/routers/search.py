@@ -26,6 +26,7 @@ async def search_items(
     sort_order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    use_regex: bool = Query(False, description="Enable regex pattern matching"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -33,6 +34,7 @@ async def search_items(
     Search for items across all receipts.
     
     Search matches against item name and brand (case-insensitive, partial match).
+    When use_regex=true, the keyword is treated as a regex pattern.
     """
     search_service = SearchService(db)
     return await search_service.search_items(
@@ -45,6 +47,7 @@ async def search_items(
         sort_order=sort_order,
         page=page,
         page_size=page_size,
+        use_regex=use_regex,
     )
 
 
